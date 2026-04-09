@@ -53,12 +53,13 @@
         </div>
       </div>
 
-      <div class="groups">
+      <div class="groups" :class="props.groupSelectable && 'selectable'">
         <div
           v-for="group in groups"
           :key="group.id"
           :class="['group', group.className]"
           :style="group.cssVariables"
+          @click="onClickGroup(group.id)"
         >
           <div :class="['group-label', { fixed: fixedLabels }]">
             <slot name="group-label" :group="group">
@@ -156,6 +157,7 @@
     groups?: GTimelineGroup[];
     items?: GTimelineItem[];
     markers?: GTimelineMarker[];
+    groupSelectable?: boolean;
     viewportMin?: number;
     viewportMax?: number;
     minViewportDuration?: number;
@@ -177,6 +179,7 @@
     items: () => [],
     markers: () => [],
     scales: () => [],
+    groupSelectable: false,
     viewportMin: undefined,
     viewportMax: undefined,
     minViewportDuration: 1000,
@@ -216,6 +219,7 @@
     (e: 'pointerup', value: { time: number; event: PointerEvent, item: GTimelineItem | GTimelineMarker | null }): void;
     (e: 'wheel', value: WheelEvent): void;
     (e: 'click', value: { time: number; event: MouseEvent, item: GTimelineItem | GTimelineMarker | null }): void;
+    (e: 'clickGroup', value: { id: string }): void;
     (e: 'contextmenu', value: { time: number; event: MouseEvent, item: GTimelineItem | GTimelineMarker | null }): void;
     (e: 'touchmove', value: { time: number; event: TouchEvent}): void;
     (e: 'touchstart', value: { time: number; event: TouchEvent}): void;
@@ -617,6 +621,12 @@
     emit('click', { time: getPositionInMsOfUIEvent(event), event, item });
   }
 
+  function onClickGroup (id: string) {
+    if (props.groupSelectable) {
+      emit('clickGroup', { id });
+    }
+  }
+
   function onContextMenu (event: MouseEvent, item: GTimelineItem | GTimelineMarker | null = null) {
     emit('contextmenu', { time: getPositionInMsOfUIEvent(event), event, item });
   }
@@ -702,9 +712,22 @@
 
   .groups {
     position: relative;
+
+    &.selectable {
+      .group {
+        cursor: pointer;
+        transition: background 0.2s, color 0.2s;
+
+        &:hover {
+          background: var(--group-hover-background, transparent);
+          color: var(--group-hover-color, inherit);
+        }
+      }
+    }
   }
 
   .group {
+    background: var(--group-background, transparent);
     border-top: var(--group-border-top, 1px solid color-mix(in srgb, currentColor 15%, transparent));
     padding-top: var(--group-padding-top, 0);
     padding-bottom: var(--group-padding-bottom, 0.4em);
