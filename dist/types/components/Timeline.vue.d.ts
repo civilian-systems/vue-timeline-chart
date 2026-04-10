@@ -24,6 +24,11 @@ declare const _default: <GTimelineItem extends TimelineItem, GTimelineGroup exte
     onClickGroup?: (value: {
         id: string;
     }) => any;
+    onClickGroupItem?: (value: {
+        time: number;
+        event: MouseEvent;
+        item: GTimelineItem | GTimelineMarker;
+    }) => any;
     onContextmenu?: (value: {
         time: number;
         event: MouseEvent;
@@ -56,7 +61,7 @@ declare const _default: <GTimelineItem extends TimelineItem, GTimelineGroup exte
     items?: GTimelineItem[];
     markers?: GTimelineMarker[];
     groupSelectable?: boolean;
-    groupSelectableOnItemClick?: boolean;
+    groupItemSelectable?: boolean;
     viewportMin?: number;
     viewportMax?: number;
     minViewportDuration?: number;
@@ -100,6 +105,11 @@ declare const _default: <GTimelineItem extends TimelineItem, GTimelineGroup exte
         }): void;
         (e: 'clickGroup', value: {
             id: string;
+        }): void;
+        (e: 'clickGroupItem', value: {
+            time: number;
+            event: MouseEvent;
+            item: GTimelineItem | GTimelineMarker;
         }): void;
         (e: 'contextmenu', value: {
             time: number;
@@ -195,6 +205,11 @@ declare const _default: <GTimelineItem extends TimelineItem, GTimelineGroup exte
         onClickGroup?: (value: {
             id: string;
         }) => any;
+        onClickGroupItem?: (value: {
+            time: number;
+            event: MouseEvent;
+            item: GTimelineItem | GTimelineMarker;
+        }) => any;
         onContextmenu?: (value: {
             time: number;
             event: MouseEvent;
@@ -227,7 +242,7 @@ declare const _default: <GTimelineItem extends TimelineItem, GTimelineGroup exte
         items?: GTimelineItem[];
         markers?: GTimelineMarker[];
         groupSelectable?: boolean;
-        groupSelectableOnItemClick?: boolean;
+        groupItemSelectable?: boolean;
         viewportMin?: number;
         viewportMax?: number;
         minViewportDuration?: number;
@@ -312,6 +327,11 @@ declare const _default: <GTimelineItem extends TimelineItem, GTimelineGroup exte
         (e: 'clickGroup', value: {
             id: string;
         }): void;
+        (e: 'clickGroupItem', value: {
+            time: number;
+            event: MouseEvent;
+            item: GTimelineItem | GTimelineMarker;
+        }): void;
         (e: 'contextmenu', value: {
             time: number;
             event: MouseEvent;
@@ -370,6 +390,11 @@ declare const _default: <GTimelineItem extends TimelineItem, GTimelineGroup exte
             onClickGroup?: (value: {
                 id: string;
             }) => any;
+            onClickGroupItem?: (value: {
+                time: number;
+                event: MouseEvent;
+                item: GTimelineItem | GTimelineMarker;
+            }) => any;
             onContextmenu?: (value: {
                 time: number;
                 event: MouseEvent;
@@ -402,7 +427,7 @@ declare const _default: <GTimelineItem extends TimelineItem, GTimelineGroup exte
             items?: GTimelineItem[];
             markers?: GTimelineMarker[];
             groupSelectable?: boolean;
-            groupSelectableOnItemClick?: boolean;
+            groupItemSelectable?: boolean;
             viewportMin?: number;
             viewportMax?: number;
             minViewportDuration?: number;
@@ -486,6 +511,11 @@ declare const _default: <GTimelineItem extends TimelineItem, GTimelineGroup exte
             }): void;
             (e: 'clickGroup', value: {
                 id: string;
+            }): void;
+            (e: 'clickGroupItem', value: {
+                time: number;
+                event: MouseEvent;
+                item: GTimelineItem | GTimelineMarker;
             }): void;
             (e: 'contextmenu', value: {
                 time: number;
