@@ -56,6 +56,7 @@ declare const _default: <GTimelineItem extends TimelineItem, GTimelineGroup exte
     items?: GTimelineItem[];
     markers?: GTimelineMarker[];
     groupSelectable?: boolean;
+    groupSelectableOnItemClick?: boolean;
     viewportMin?: number;
     viewportMax?: number;
     minViewportDuration?: number;
@@ -226,6 +227,7 @@ declare const _default: <GTimelineItem extends TimelineItem, GTimelineGroup exte
         items?: GTimelineItem[];
         markers?: GTimelineMarker[];
         groupSelectable?: boolean;
+        groupSelectableOnItemClick?: boolean;
         viewportMin?: number;
         viewportMax?: number;
         minViewportDuration?: number;
@@ -400,6 +402,7 @@ declare const _default: <GTimelineItem extends TimelineItem, GTimelineGroup exte
             items?: GTimelineItem[];
             markers?: GTimelineMarker[];
             groupSelectable?: boolean;
+            groupSelectableOnItemClick?: boolean;
             viewportMin?: number;
             viewportMax?: number;
             minViewportDuration?: number;
