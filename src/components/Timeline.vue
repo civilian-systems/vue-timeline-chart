@@ -80,7 +80,7 @@
                 :key="item.id ?? index"
                 :style="getStyle(item)"
                 :class="['item', item.type, item.className, {active: activeItems.includes(item.id)}]"
-                @click.stop="onClick($event, item)"
+                @click="onClick($event, item)"
                 @pointermove.stop="onPointerMove($event, item)"
                 @pointerdown.stop="onPointerDown($event, item)"
                 @pointerup.stop="onPointerUp($event, item)"
@@ -158,6 +158,7 @@
     items?: GTimelineItem[];
     markers?: GTimelineMarker[];
     groupSelectable?: boolean;
+    groupSelectableOnItemClick?: boolean;
     viewportMin?: number;
     viewportMax?: number;
     minViewportDuration?: number;
@@ -180,6 +181,7 @@
     markers: () => [],
     scales: () => [],
     groupSelectable: false,
+    groupSelectableOnItemClick: false,
     viewportMin: undefined,
     viewportMax: undefined,
     minViewportDuration: 1000,
@@ -618,7 +620,12 @@
   }
 
   function onClick (event: MouseEvent, item: GTimelineItem | GTimelineMarker | null = null) {
-    emit('click', { time: getPositionInMsOfUIEvent(event), event, item });
+    if (!props.groupSelectableOnItemClick) {
+      event.stopPropagation();
+    }
+    else {
+      emit('click', { time: getPositionInMsOfUIEvent(event), event, item });
+    }
   }
 
   function onClickGroup (id: string) {
