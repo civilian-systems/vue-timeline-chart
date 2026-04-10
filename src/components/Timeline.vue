@@ -58,7 +58,7 @@
           :key="group.id"
           :class="['group', group.className]"
           :style="group.cssVariables"
-          @click="onClickGroup($event, group.id)"
+          @click="onClickGroup(group.id)"
         >
           <div :class="['group-label', { fixed: fixedLabels }]">
             <slot name="group-label" :group="group">
