@@ -620,12 +620,7 @@
   }
 
   function onClick (event: MouseEvent, item: GTimelineItem | GTimelineMarker | null = null) {
-    if (!props.groupSelectableOnItemClick) {
-      event.stopPropagation();
-    }
-    else {
-      emit('click', { time: getPositionInMsOfUIEvent(event), event, item });
-    }
+    emit('click', { time: getPositionInMsOfUIEvent(event), event, item });
   }
 
   function onClickGroup (id: string) {
