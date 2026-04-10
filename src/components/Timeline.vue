@@ -4,7 +4,6 @@
       ref="timelineEl"
       class="timeline"
       @wheel="onWheel"
-      @click="onClick"
       @touchmove="onTouchMove"
       @touchstart="onTouchStart"
       @touchend="onTouchEnd"
@@ -59,7 +58,7 @@
           :key="group.id"
           :class="['group', group.className]"
           :style="group.cssVariables"
-          @click="onClickGroup(group.id)"
+          @click="onClickGroup($event, group.id)"
         >
           <div :class="['group-label', { fixed: fixedLabels }]">
             <slot name="group-label" :group="group">
@@ -79,8 +78,8 @@
                 v-for="(item, index) in visibleItems.filter((item) => item.group === group.id && item.type !== 'background')"
                 :key="item.id ?? index"
                 :style="getStyle(item)"
-                :class="['item', item.type, item.className, {active: activeItems.includes(item.id)}]"
-                @click="onClick($event, item)"
+                :class="['item', item.type, item.className, props.groupSelectable && 'selectable', {active: activeItems.includes(item.id)}]"
+                @click="onClickGroupItem($event, item)"
                 @pointermove.stop="onPointerMove($event, item)"
                 @pointerdown.stop="onPointerDown($event, item)"
                 @pointerup.stop="onPointerUp($event, item)"
@@ -95,7 +94,7 @@
             :key="item.id ?? `${item.start}${item.type}${item.end || ''}`"
             :style="getStyle(item)"
             :class="[item.type, item.className]"
-            @click.stop="onClick($event, item)"
+            @click.stop="onClickGroupItem($event, item)"
             @pointermove.stop="onPointerMove($event, item)"
             @pointerdown.stop="onPointerDown($event, item)"
             @pointerup.stop="onPointerUp($event, item)"
@@ -118,7 +117,7 @@
             :key="item.id ?? `${item.start}${item.type}${item.end || ''}`"
             :style="getStyle(item)"
             :class="[item.type, item.className]"
-            @click.stop="onClick($event, item)"
+            @click.stop="onClickGroupItem($event, item)"
             @pointermove.stop="onPointerMove($event, item)"
             @pointerdown.stop="onPointerDown($event, item)"
             @pointerup.stop="onPointerUp($event, item)"
@@ -158,7 +157,7 @@
     items?: GTimelineItem[];
     markers?: GTimelineMarker[];
     groupSelectable?: boolean;
-    groupSelectableOnItemClick?: boolean;
+    groupItemSelectable?: boolean;
     viewportMin?: number;
     viewportMax?: number;
     minViewportDuration?: number;
@@ -181,7 +180,7 @@
     markers: () => [],
     scales: () => [],
     groupSelectable: false,
-    groupSelectableOnItemClick: false,
+    groupItemSelectable: false,
     viewportMin: undefined,
     viewportMax: undefined,
     minViewportDuration: 1000,
@@ -222,6 +221,7 @@
     (e: 'wheel', value: WheelEvent): void;
     (e: 'click', value: { time: number; event: MouseEvent, item: GTimelineItem | GTimelineMarker | null }): void;
     (e: 'clickGroup', value: { id: string }): void;
+    (e: 'clickGroupItem', value: { time: number; event: MouseEvent, item: GTimelineItem | GTimelineMarker | null }): void;
     (e: 'contextmenu', value: { time: number; event: MouseEvent, item: GTimelineItem | GTimelineMarker | null }): void;
     (e: 'touchmove', value: { time: number; event: TouchEvent}): void;
     (e: 'touchstart', value: { time: number; event: TouchEvent}): void;
@@ -619,8 +619,10 @@
     emit('pointerup', { time: getPositionInMsOfUIEvent(event), event, item });
   }
 
-  function onClick (event: MouseEvent, item: GTimelineItem | GTimelineMarker | null = null) {
-    emit('click', { time: getPositionInMsOfUIEvent(event), event, item });
+  function onClickGroupItem (event: MouseEvent, item: GTimelineItem | GTimelineMarker | null = null) {
+    if (props.groupItemSelectable) {
+      emit('clickGroupItem', { time: getPositionInMsOfUIEvent(event), event, item });
+    }
   }
 
   function onClickGroup (id: string) {
@@ -759,7 +761,6 @@
   }
 
   .item {
-    cursor: pointer;
     height: 100%;
     background: var(--item-background, #007bff);
     opacity: 0.7;
@@ -781,6 +782,10 @@
 
     &.range {
       border-radius: var(--item-range-border-radius, 0.5em);
+    }
+
+    &.selectable {
+      cursor: pointer;
     }
   }
 
