@@ -1,4 +1,4 @@
-import { ref as P, watch as x, computed as T, onMounted as ve, nextTick as _e, unref as R, getCurrentScope as et, onScopeDispose as tt, getCurrentInstance as Ee, defineComponent as nt, watchEffect as ot, createElementBlock as M, openBlock as S, createElementVNode as z, withModifiers as $, renderSlot as _, Fragment as E, renderList as X, normalizeStyle as L, normalizeClass as W, createTextVNode as xe, toDisplayString as Pe, createCommentVNode as Ce } from "vue";
+import { ref as P, watch as x, computed as T, onMounted as ve, nextTick as _e, unref as R, getCurrentScope as et, onScopeDispose as tt, getCurrentInstance as Ee, defineComponent as nt, watchEffect as ot, createElementBlock as M, openBlock as S, createElementVNode as z, withModifiers as C, renderSlot as _, Fragment as E, renderList as X, normalizeStyle as L, normalizeClass as W, createTextVNode as xe, toDisplayString as Pe, createCommentVNode as Ie } from "vue";
 const st = (t) => {
   const o = P(0), s = P(0);
   let n;
@@ -18,7 +18,7 @@ const st = (t) => {
     width: o,
     height: s
   };
-}, te = function(t) {
+}, ee = function(t) {
   return `${t}`.trim().padStart(2, "0");
 };
 function g(t) {
@@ -86,7 +86,7 @@ function ht(t) {
   const o = g(t);
   return o.setSeconds(0, 0), o;
 }
-function $e(t, o) {
+function Ce(t, o) {
   const s = ht(g(t.start)), n = g(t.end);
   let u = +s > +n;
   const p = u ? +s : +n;
@@ -165,7 +165,7 @@ const Z = {
   weeks: 1e3 * 60 * 60 * 24 * 7,
   months: 1e3 * 60 * 60 * 24 * 7 * 4,
   years: 1e3 * 60 * 60 * 24 * 7 * 4 * 12
-}, Ie = (t) => Object.keys(Z).indexOf(t), Mt = (t, o, s, n, u, p) => {
+}, $e = (t) => Object.keys(Z).indexOf(t), Mt = (t, o, s, n, u, p) => {
   const i = P(s.value), f = P(n.value), c = T(() => (u.value?.length ? u.value : [
     // #region default-scales
     {
@@ -206,7 +206,7 @@ const Z = {
       steps: [1, 5, 10, 25, 50, 100, 250, 500, 1e3]
     }
     // #endregion default-scales
-  ]).toSorted((v, w) => Ie(v.unit) - Ie(w.unit)).flatMap((v) => v.steps.toSorted((w, k) => w - k).map((w) => ({ unit: v.unit, step: w }))));
+  ]).toSorted((v, w) => $e(v.unit) - $e(w.unit)).flatMap((v) => v.steps.toSorted((w, k) => w - k).map((w) => ({ unit: v.unit, step: w }))));
   x(s, () => {
     i.value = s.value;
   }), x(n, () => {
@@ -259,15 +259,15 @@ const Z = {
         D = Array.from({ length: k - w }, (O, V) => new Date(w + V));
         break;
       case "seconds":
-        D = $e({ start: w, end: k }).flatMap((O) => {
+        D = Ce({ start: w, end: k }).flatMap((O) => {
           const V = [];
-          for (let C = 0; C < 60; C++)
-            V.push(new Date(O.valueOf() + C * Z.seconds));
+          for (let I = 0; I < 60; I++)
+            V.push(new Date(O.valueOf() + I * Z.seconds));
           return V;
         });
         break;
       case "minutes":
-        D = $e({ start: w, end: k });
+        D = Ce({ start: w, end: k });
         break;
       case "hours":
         D = vt({ start: w, end: k });
@@ -300,7 +300,7 @@ const Z = {
 function we(t) {
   return et() ? (tt(t), !0) : !1;
 }
-function ne(t) {
+function te(t) {
   return typeof t == "function" ? t() : R(t);
 }
 const St = typeof window < "u" && typeof document < "u";
@@ -310,13 +310,13 @@ const Ot = (t) => t != null, Tt = Object.prototype.toString, Vt = (t) => Tt.call
 function Pt(t) {
   return Ee();
 }
-function Ct(t, o = !0, s) {
+function It(t, o = !0, s) {
   Pt() ? ve(t, s) : o ? t() : _e(t);
 }
 const me = St ? window : void 0;
-function B(t) {
+function G(t) {
   var o;
-  const s = ne(t);
+  const s = te(t);
   return (o = s?.$el) != null ? o : s;
 }
 function We(...t) {
@@ -327,7 +327,7 @@ function We(...t) {
   const p = [], i = () => {
     p.forEach((h) => h()), p.length = 0;
   }, f = (h, m, v, w) => (h.addEventListener(m, v, w), () => h.removeEventListener(m, v, w)), c = x(
-    () => [B(o), ne(u)],
+    () => [G(o), te(u)],
     ([h, m]) => {
       if (i(), !h)
         return;
@@ -342,23 +342,23 @@ function We(...t) {
   };
   return we(d), d;
 }
-function $t() {
+function Ct() {
   const t = P(!1), o = Ee();
   return o && ve(() => {
     t.value = !0;
   }, o), t;
 }
 function Le(t) {
-  const o = $t();
+  const o = Ct();
   return T(() => (o.value, !!t()));
 }
-function It(t, o, s = {}) {
+function $t(t, o, s = {}) {
   const { window: n = me, ...u } = s;
   let p;
   const i = Le(() => n && "MutationObserver" in n), f = () => {
     p && (p.disconnect(), p = void 0);
   }, c = T(() => {
-    const v = ne(t), w = (Array.isArray(v) ? v : [v]).map(B).filter(Ot);
+    const v = te(t), w = (Array.isArray(v) ? v : [v]).map(G).filter(Ot);
     return new Set(w);
   }), d = x(
     () => c.value,
@@ -381,8 +381,8 @@ function Wt(t, o, s = {}) {
   const i = Le(() => n && "ResizeObserver" in n), f = () => {
     p && (p.disconnect(), p = void 0);
   }, c = T(() => {
-    const m = ne(t);
-    return Array.isArray(m) ? m.map((v) => B(v)) : [B(m)];
+    const m = te(t);
+    return Array.isArray(m) ? m.map((v) => G(v)) : [G(m)];
   }), d = x(
     c,
     (m) => {
@@ -410,20 +410,20 @@ function _t(t, o = {}) {
     updateTiming: i = "sync"
   } = o, f = P(0), c = P(0), d = P(0), h = P(0), m = P(0), v = P(0), w = P(0), k = P(0);
   function D() {
-    const V = B(t);
+    const V = G(t);
     if (!V) {
       s && (f.value = 0, c.value = 0, d.value = 0, h.value = 0, m.value = 0, v.value = 0, w.value = 0, k.value = 0);
       return;
     }
-    const C = V.getBoundingClientRect();
-    f.value = C.height, c.value = C.bottom, d.value = C.left, h.value = C.right, m.value = C.top, v.value = C.width, w.value = C.x, k.value = C.y;
+    const I = V.getBoundingClientRect();
+    f.value = I.height, c.value = I.bottom, d.value = I.left, h.value = I.right, m.value = I.top, v.value = I.width, w.value = I.x, k.value = I.y;
   }
   function O() {
     i === "sync" ? D() : i === "next-frame" && requestAnimationFrame(() => D());
   }
-  return Wt(t, O), x(() => B(t), (V) => !V && O()), It(t, O, {
+  return Wt(t, O), x(() => G(t), (V) => !V && O()), $t(t, O, {
     attributeFilter: ["style", "class"]
-  }), u && We("scroll", O, { capture: !0, passive: !0 }), n && We("resize", O, { passive: !0 }), Ct(() => {
+  }), u && We("scroll", O, { capture: !0, passive: !0 }), n && We("resize", O, { passive: !0 }), It(() => {
     p && O();
   }), {
     height: f,
@@ -497,14 +497,14 @@ const Xt = { class: "timeline-wrapper" }, Lt = { class: "timestamps" }, Yt = ["o
 }, Rt = ["onClick", "onPointermove", "onPointerdown", "onPointerup", "onContextmenu"], jt = {
   key: 1,
   class: "markers"
-}, Bt = /* @__PURE__ */ nt({
+}, Gt = /* @__PURE__ */ nt({
   __name: "Timeline",
   props: {
     groups: { default: () => [] },
     items: { default: () => [] },
     markers: { default: () => [] },
     groupSelectable: { type: Boolean, default: !1 },
-    groupSelectableOnItemClick: { type: Boolean, default: !1 },
+    groupItemSelectable: { type: Boolean, default: !1 },
     viewportMin: { default: void 0 },
     viewportMax: { default: void 0 },
     minViewportDuration: { default: 1e3 },
@@ -519,7 +519,7 @@ const Xt = { class: "timeline-wrapper" }, Lt = { class: "timestamps" }, Yt = ["o
         year: fe(s).valueOf() === t ? "numeric" : void 0,
         era: fe(s).valueOf() === t && fe(s).getFullYear() <= 0 ? "short" : void 0,
         day: o.unit !== "years" && !(o.unit === "months" && o.step >= 1) && pe(s).valueOf() === t ? "numeric" : void 0
-      })} `), ["hours", "minutes", "seconds", "ms"].includes(o.unit) && (n += `${te(s.getHours())}:${te(s.getMinutes())}${s.getSeconds() > 0 ? `:${te(s.getSeconds())}` : ""}${s.getMilliseconds() > 0 ? `.${te(s.getMilliseconds())}` : ""}`), n;
+      })} `), ["hours", "minutes", "seconds", "ms"].includes(o.unit) && (n += `${ee(s.getHours())}:${ee(s.getMinutes())}${s.getSeconds() > 0 ? `:${ee(s.getSeconds())}` : ""}${s.getMilliseconds() > 0 ? `.${ee(s.getMilliseconds())}` : ""}`), n;
     } },
     fixedLabels: { type: Boolean, default: !1 },
     minTimestampWidth: { default: 100 },
@@ -529,13 +529,13 @@ const Xt = { class: "timeline-wrapper" }, Lt = { class: "timestamps" }, Yt = ["o
     scales: { default: () => [] },
     weekStartsOn: { default: 0 }
   },
-  emits: ["pointermove", "pointerdown", "pointerup", "wheel", "click", "clickGroup", "contextmenu", "touchmove", "touchstart", "touchend", "mousemoveTimeline", "mouseleaveTimeline", "changeViewport", "changeScale"],
+  emits: ["pointermove", "pointerdown", "pointerup", "wheel", "click", "clickGroup", "clickGroupItem", "contextmenu", "touchmove", "touchstart", "touchend", "mousemoveTimeline", "mouseleaveTimeline", "changeViewport", "changeScale"],
   setup(t, { expose: o, emit: s }) {
     const n = t, u = s;
     o({
       setViewport: F,
       onWheel: be,
-      clearCache: re
+      clearCache: se
     });
     const p = P(null), { width: i } = st(p), f = P(0), c = P(1e4), d = T(() => c.value - f.value), h = T(() => i.value / d.value);
     x([f, c], ([e, l]) => {
@@ -569,19 +569,19 @@ const Xt = { class: "timeline-wrapper" }, Lt = { class: "timestamps" }, Yt = ["o
     }), x([() => n.initialViewportStart, () => n.initialViewportEnd], () => {
       F(n.initialViewportStart, n.initialViewportEnd);
     });
-    const D = T(() => n.items.filter((e) => e.start < c.value && (e.end ?? e.start) > f.value).sort((e, l) => e.start - l.start) || []), O = T(() => n.markers.filter((e) => e.start < c.value && e.start > f.value).sort((e, l) => e.start - l.start) || []), V = T(() => O.value.filter((e) => !e.group)), C = T(() => D.value.filter((e) => e.type === "background" && !e.group)), oe = /* @__PURE__ */ new Map(), se = /* @__PURE__ */ new Map();
-    function re() {
-      oe.clear(), se.clear();
+    const D = T(() => n.items.filter((e) => e.start < c.value && (e.end ?? e.start) > f.value).sort((e, l) => e.start - l.start) || []), O = T(() => n.markers.filter((e) => e.start < c.value && e.start > f.value).sort((e, l) => e.start - l.start) || []), V = T(() => O.value.filter((e) => !e.group)), I = T(() => D.value.filter((e) => e.type === "background" && !e.group)), ne = /* @__PURE__ */ new Map(), oe = /* @__PURE__ */ new Map();
+    function se() {
+      ne.clear(), oe.clear();
     }
     x([f, c, i], () => {
-      re();
+      se();
     }), x(D, () => {
-      oe.clear();
+      ne.clear();
     }), x(O, () => {
-      se.clear();
+      oe.clear();
     }), ve(() => {
       k(), _e(() => {
-        re();
+        se();
       });
     });
     function Ne(e) {
@@ -592,14 +592,14 @@ const Xt = { class: "timeline-wrapper" }, Lt = { class: "timestamps" }, Yt = ["o
       };
     }
     function H(e, l = !1) {
-      const r = l ? se : oe, a = r.get(e.id ?? `${e.start}${e.type}${e.end || ""}`);
+      const r = l ? oe : ne, a = r.get(e.id ?? `${e.start}${e.type}${e.end || ""}`);
       if (a)
         return a;
       const y = Ne(e);
       return r.set(e.id ?? `${e.start}${e.type}${e.end || ""}`, y), y;
     }
-    const He = T(() => i.value / n.minTimestampWidth), { visibleTimestamps: ye, scale: G } = Mt(f, c, d, He, T(() => n.scales), T(() => n.weekStartsOn)), Fe = T(() => ye.value.map((e) => ke(e)));
-    x(G, (e, l) => {
+    const He = T(() => i.value / n.minTimestampWidth), { visibleTimestamps: ye, scale: B } = Mt(f, c, d, He, T(() => n.scales), T(() => n.weekStartsOn)), Fe = T(() => ye.value.map((e) => ke(e)));
+    x(B, (e, l) => {
       e.step === l?.step && e.unit === l?.unit || u("changeScale", e);
     }, { immediate: !0 });
     function Ae(e) {
@@ -625,7 +625,7 @@ const Xt = { class: "timeline-wrapper" }, Lt = { class: "timestamps" }, Yt = ["o
       const a = (l - e) / d.value * i.value;
       return Math.min(a, ge.value);
     }
-    function ie(e, l) {
+    function re(e, l) {
       const r = e / i.value * d.value;
       e > 0 && c.value === n.viewportMax || e < 0 && f.value === n.viewportMin || (F(f.value + r, c.value + r), l.type === "wheel" && ue(l));
     }
@@ -655,11 +655,11 @@ const Xt = { class: "timeline-wrapper" }, Lt = { class: "timestamps" }, Yt = ["o
       if (De(), u("wheel", e), e.deltaY === 0 && e.preventDefault(), e.shiftKey) {
         e.preventDefault();
         const y = e.deltaY === 0 && e.deltaX !== 0 ? e.deltaX : e.deltaY;
-        ie(y * (e.deltaMode === 0 ? 1 : 18), e);
+        re(y * (e.deltaMode === 0 ? 1 : 18), e);
         return;
       }
       if (e.deltaX !== 0) {
-        ie(e.deltaX * (e.deltaMode === 0 ? 1 : 18), e);
+        re(e.deltaX * (e.deltaMode === 0 ? 1 : 18), e);
         return;
       }
       if (!(e.metaKey || e.ctrlKey))
@@ -685,29 +685,29 @@ Setting different values for minViewportDuration and maxViewportDuration might h
       const r = (l - m.value) / i.value;
       return f.value + d.value * r;
     }
-    const { state: I, setLastTouchX: ae, setInitialTouchList: Me } = Et({ viewportStart: f, viewportEnd: c });
-    function Be(e) {
-      if (e.touches.length === 2 && I.initialPinchDistance !== null && I.initialTouchViewportStart !== null && I.initialTouchViewportEnd !== null) {
+    const { state: $, setLastTouchX: ie, setInitialTouchList: Me } = Et({ viewportStart: f, viewportEnd: c });
+    function Ge(e) {
+      if (e.touches.length === 2 && $.initialPinchDistance !== null && $.initialTouchViewportStart !== null && $.initialTouchViewportEnd !== null) {
         const [l, r] = [...e.touches].sort((ce, de) => ce.clientX - de.clientX), [a, y] = [l, r].map(
-          (ce) => [...I.initialTouchList].find((de) => de.identifier === ce.identifier)
-        ), A = Ye(l, r) / I.initialPinchDistance, le = (a.screenX + y.screenX) / 2, Ke = -((l.screenX + r.screenX) / 2 - le) / h.value, Ue = (le - m.value) / i.value, Oe = I.initialTouchViewportEnd - I.initialTouchViewportStart, Te = Oe / A, Je = Te - Oe, Ve = I.initialTouchViewportStart - Je * Ue + Ke, Qe = Ve + Te;
+          (ce) => [...$.initialTouchList].find((de) => de.identifier === ce.identifier)
+        ), A = Ye(l, r) / $.initialPinchDistance, le = (a.screenX + y.screenX) / 2, Ke = -((l.screenX + r.screenX) / 2 - le) / h.value, Ue = (le - m.value) / i.value, Oe = $.initialTouchViewportEnd - $.initialTouchViewportStart, Te = Oe / A, Je = Te - Oe, Ve = $.initialTouchViewportStart - Je * Ue + Ke, Qe = Ve + Te;
         F(Ve, Qe);
       } else if (e.touches.length === 1) {
         const [l] = e.touches;
-        if (I.lastTouchX === null)
-          I.lastTouchX = l.clientX;
+        if ($.lastTouchX === null)
+          $.lastTouchX = l.clientX;
         else {
-          const r = I.lastTouchX - l.clientX;
-          ie(r, e), ae(e);
+          const r = $.lastTouchX - l.clientX;
+          re(r, e), ie(e);
         }
       }
       u("touchmove", { time: Y(e), event: e });
     }
-    function Ge(e) {
-      Me(e), ae(e), u("touchstart", { time: Y(e), event: e });
+    function Be(e) {
+      Me(e), ie(e), u("touchstart", { time: Y(e), event: e });
     }
     function ze(e) {
-      ae(e), Me(e), u("touchend", { event: e });
+      ie(e), Me(e), u("touchend", { event: e });
     }
     function K(e, l = null) {
       u("pointerdown", { time: Y(e), event: e, item: l });
@@ -718,13 +718,13 @@ Setting different values for minViewportDuration and maxViewportDuration might h
     function J(e, l = null) {
       u("pointerup", { time: Y(e), event: e, item: l });
     }
-    function Q(e, l = null) {
-      n.groupSelectableOnItemClick ? u("click", { time: Y(e), event: e, item: l }) : e.stopPropagation();
+    function ae(e, l = null) {
+      n.groupItemSelectable && u("clickGroupItem", { time: Y(e), event: e, item: l });
     }
     function Ze(e) {
       n.groupSelectable && u("clickGroup", { id: e });
     }
-    function ee(e, l = null) {
+    function Q(e, l = null) {
       u("contextmenu", { time: Y(e), event: e, item: l });
     }
     function ue(e) {
@@ -739,19 +739,18 @@ Setting different values for minViewportDuration and maxViewportDuration might h
         ref: p,
         class: "timeline",
         onWheel: be,
-        onClick: Q,
-        onTouchmove: Be,
-        onTouchstart: Ge,
+        onTouchmove: Ge,
+        onTouchstart: Be,
         onTouchend: ze,
         onPointermove: U,
         onPointerdown: K,
         onPointerup: J,
-        onContextmenu: $(ee, ["prevent"]),
+        onContextmenu: C(Q, ["prevent"]),
         onMousemove: ue,
         onMouseleave: qe
       }, [
         z("div", Lt, [
-          _(e.$slots, "timestamps-before", { scale: R(G) }, void 0, !0),
+          _(e.$slots, "timestamps-before", { scale: R(B) }, void 0, !0),
           (S(!0), M(E, null, X(R(ye), (r, a) => (S(), M("div", {
             key: r,
             class: W(["timestamp", Ae(r)]),
@@ -759,12 +758,12 @@ Setting different values for minViewportDuration and maxViewportDuration might h
           }, [
             _(e.$slots, "timestamp", {
               timestamp: r,
-              scale: R(G)
+              scale: R(B)
             }, () => [
-              xe(Pe(e.renderTimestampLabel(r, R(G))), 1)
+              xe(Pe(e.renderTimestampLabel(r, R(B))), 1)
             ], !0)
           ], 6))), 128)),
-          _(e.$slots, "timestamps-after", { scale: R(G) }, void 0, !0),
+          _(e.$slots, "timestamps-after", { scale: R(B) }, void 0, !0),
           (S(!0), M(E, null, X(O.value.filter((r) => r.group === "_timestamps"), (r) => (S(), M("div", {
             key: r.id ?? `${r.start}${r.type}`,
             style: L(H(r)),
@@ -806,12 +805,12 @@ Setting different values for minViewportDuration and maxViewportDuration might h
                 (S(!0), M(E, null, X(D.value.filter((a) => a.group === r.id && a.type !== "background"), (a, y) => (S(), M("div", {
                   key: a.id ?? y,
                   style: L(H(a)),
-                  class: W(["item", a.type, a.className, { active: e.activeItems.includes(a.id) }]),
-                  onClick: (b) => Q(b, a),
-                  onPointermove: $((b) => U(b, a), ["stop"]),
-                  onPointerdown: $((b) => K(b, a), ["stop"]),
-                  onPointerup: $((b) => J(b, a), ["stop"]),
-                  onContextmenu: $((b) => ee(b, a), ["prevent", "stop"])
+                  class: W(["item", a.type, a.className, n.groupSelectable && "selectable", { active: e.activeItems.includes(a.id) }]),
+                  onClick: (b) => ae(b, a),
+                  onPointermove: C((b) => U(b, a), ["stop"]),
+                  onPointerdown: C((b) => K(b, a), ["stop"]),
+                  onPointerup: C((b) => J(b, a), ["stop"]),
+                  onContextmenu: C((b) => Q(b, a), ["prevent", "stop"])
                 }, [
                   _(e.$slots, "item", { item: a }, void 0, !0)
                 ], 46, Ht))), 128))
@@ -821,11 +820,11 @@ Setting different values for minViewportDuration and maxViewportDuration might h
               key: a.id ?? `${a.start}${a.type}${a.end || ""}`,
               style: L(H(a)),
               class: W([a.type, a.className]),
-              onClick: $((y) => Q(y, a), ["stop"]),
-              onPointermove: $((y) => U(y, a), ["stop"]),
-              onPointerdown: $((y) => K(y, a), ["stop"]),
-              onPointerup: $((y) => J(y, a), ["stop"]),
-              onContextmenu: $((y) => ee(y, a), ["prevent", "stop"])
+              onClick: C((y) => ae(y, a), ["stop"]),
+              onPointermove: C((y) => U(y, a), ["stop"]),
+              onPointerdown: C((y) => K(y, a), ["stop"]),
+              onPointerup: C((y) => J(y, a), ["stop"]),
+              onContextmenu: C((y) => Q(y, a), ["prevent", "stop"])
             }, null, 46, Ft))), 128)),
             (S(!0), M(E, null, X(O.value.filter((a) => a.group === r.id), (a) => (S(), M("div", {
               key: a.id ?? `${a.start}${a.type}`,
@@ -835,18 +834,18 @@ Setting different values for minViewportDuration and maxViewportDuration might h
               _(e.$slots, "marker", { item: a }, void 0, !0)
             ], 6))), 128))
           ], 14, Yt))), 128)),
-          C.value.length > 0 ? (S(), M("div", At, [
-            (S(!0), M(E, null, X(C.value, (r) => (S(), M("div", {
+          I.value.length > 0 ? (S(), M("div", At, [
+            (S(!0), M(E, null, X(I.value, (r) => (S(), M("div", {
               key: r.id ?? `${r.start}${r.type}${r.end || ""}`,
               style: L(H(r)),
               class: W([r.type, r.className]),
-              onClick: $((a) => Q(a, r), ["stop"]),
-              onPointermove: $((a) => U(a, r), ["stop"]),
-              onPointerdown: $((a) => K(a, r), ["stop"]),
-              onPointerup: $((a) => J(a, r), ["stop"]),
-              onContextmenu: $((a) => ee(a, r), ["prevent", "stop"])
+              onClick: C((a) => ae(a, r), ["stop"]),
+              onPointermove: C((a) => U(a, r), ["stop"]),
+              onPointerdown: C((a) => K(a, r), ["stop"]),
+              onPointerup: C((a) => J(a, r), ["stop"]),
+              onContextmenu: C((a) => Q(a, r), ["prevent", "stop"])
             }, null, 46, Rt))), 128))
-          ])) : Ce("", !0),
+          ])) : Ie("", !0),
           V.value.length > 0 ? (S(), M("div", jt, [
             (S(!0), M(E, null, X(V.value, (r) => (S(), M("div", {
               key: r.id ?? `${r.start}${r.type}`,
@@ -855,17 +854,17 @@ Setting different values for minViewportDuration and maxViewportDuration might h
             }, [
               _(e.$slots, "marker", { item: r }, void 0, !0)
             ], 6))), 128))
-          ])) : Ce("", !0)
+          ])) : Ie("", !0)
         ], 2)
       ], 544)
     ]));
   }
-}), Gt = (t, o) => {
+}), Bt = (t, o) => {
   const s = t.__vccOpts || t;
   for (const [n, u] of o)
     s[n] = u;
   return s;
-}, qt = /* @__PURE__ */ Gt(Bt, [["__scopeId", "data-v-3fdf6577"]]);
+}, qt = /* @__PURE__ */ Bt(Gt, [["__scopeId", "data-v-ea59477d"]]);
 export {
   qt as Timeline
 };
