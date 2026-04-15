@@ -230,6 +230,8 @@
     (e: 'mouseleaveTimeline', value: { event: MouseEvent }): void;
     (e: 'changeViewport', value: { start: number; end: number }): void;
     (e: 'changeScale', value: TimelineScale): void;
+    (e: 'scrollHorizontally', value: { event: WheelEvent | TouchEvent }): void;
+    (e: 'zoom', value: { event: WheelEvent | TouchEvent }): void;
   }>();
 
   defineExpose({
@@ -420,6 +422,8 @@
 
     setViewport(viewportStart.value + deltaMs, viewportEnd.value + deltaMs);
 
+    onScrollHorizontally(event as WheelEvent | TouchEvent);
+
     if (event.type === 'wheel') {
       onMouseMove(event as WheelEvent);
     }
@@ -525,6 +529,8 @@
       console.error('Rounding issue probably occured while zooming.\n\nSetting different values for minViewportDuration and maxViewportDuration might help.');
       return;
     }
+
+    onZoom(event);
 
     setViewport(proposedViewportStart, proposedViewportEnd);
 
@@ -641,6 +647,14 @@
 
   function onMouseLeave (event: MouseEvent) {
     emit('mouseleaveTimeline', { event });
+  }
+
+  function onScrollHorizontally (event: WheelEvent | TouchEvent) {
+    emit('scrollHorizontally', { event });
+  }
+
+  function onZoom (event: WheelEvent | TouchEvent) {
+    emit('zoom', { event });
   }
 </script>
 
