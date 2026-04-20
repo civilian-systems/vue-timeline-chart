@@ -689,7 +689,7 @@
         }
       }
       .group {
-        padding: 7.5px 0;
+        padding: 4.5px 0;
 
         .group-label {
           position: absolute;
