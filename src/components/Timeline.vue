@@ -3,6 +3,7 @@
     <div
       ref="timelineEl"
       class="timeline"
+      :class="[`mode-${props.mode}`]"
       @wheel="onWheel"
       @touchmove="onTouchMove"
       @touchstart="onTouchStart"
@@ -166,6 +167,7 @@
     initialViewportEnd?: number;
     renderTimestampLabel?: (timestamp: number, scale: { unit: string, step: number}) => string;
     fixedLabels?: boolean;
+    mode?: 'compact' | 'default';
     minTimestampWidth?: number;
     maxZoomSpeed?: number;
     activeItems?: TimelineItem['id'][];
@@ -207,6 +209,7 @@
       return returnValue;
     },
     fixedLabels: false,
+    mode: 'default',
     minTimestampWidth: 100,
     maxZoomSpeed: 60,
     activeItems: () => [],
@@ -673,6 +676,32 @@
     @media print {
       color: black;
       print-color-adjust: exact;
+    }
+  }
+
+  .timeline {
+    &.mode-compact {
+      .item {
+        &.range {
+          top: 0;
+          bottom: 0;
+          margin: auto;
+        }
+      }
+      .group {
+        padding: 4.5px 0;
+
+        .group-label {
+          position: absolute;
+          top: 0;
+          bottom: 0;
+          z-index: 1;
+          display: flex;
+          align-items: center;
+          line-height: normal;
+          padding: 0 0 0 0.4em;
+        }
+      }
     }
   }
 
