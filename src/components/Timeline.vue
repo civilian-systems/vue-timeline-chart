@@ -1,5 +1,6 @@
 <template>
   <div class="timeline-wrapper">
+    <h1>Test</h1>
     <div
       ref="timelineEl"
       class="timeline"
