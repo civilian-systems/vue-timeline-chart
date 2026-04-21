@@ -1,5 +1,6 @@
 import Timeline from './components/Timeline.vue';
-export { Timeline };
+import TimelineTooltip from './components/TimelineTooltip.vue';
+export { Timeline, TimelineTooltip };
 export * from './components/Timeline.vue';
 export type {
   TimelineGroup,
