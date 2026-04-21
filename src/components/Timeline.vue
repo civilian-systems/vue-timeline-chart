@@ -126,7 +126,6 @@
           >
           </div>
         </div>
-
         <div v-if="visibleMarkersWithoutGroup.length > 0" class="markers">
           <div
             v-for="(item) in visibleMarkersWithoutGroup"
@@ -134,7 +133,9 @@
             :style="getStyle(item, true)"
             :class="[item.type, item.className]"
           >
-            <slot name="marker" :item="item"></slot>
+            <div :class="markerContentClassList">
+              <slot name="marker" :item="item"></slot>
+            </div>
           </div>
         </div>
       </div>
@@ -316,6 +317,42 @@
   const visibleMarkers = computed(() => props.markers.filter((item) => item.start < viewportEnd.value && item.start > viewportStart.value).sort((a, b) => a.start - b.start) || []);
   const visibleMarkersWithoutGroup = computed(() => visibleMarkers.value.filter((item) => !item.group));
   const visibleBackgroundsWithoutGroup = computed(() => visibleItems.value.filter((item) => item.type === 'background' && !item.group));
+
+  const isMarkerContentOverRightEdge = ref(false);
+  const isMarkerContentOverLeftEdge = ref(false);
+
+  const markerContentClassList = computed(() => [
+    'marker-content',
+    isMarkerContentOverRightEdge.value && 'move-left',
+    isMarkerContentOverLeftEdge.value && 'move-right',
+  ]);
+
+  const checkGuidelineMarkerPosition = () => {
+    const marker = document.querySelector('.markers .marker .marker-content');
+    const timeline = document.querySelector('.timeline');
+
+    if (!timeline || !marker) {
+      return;
+    }
+
+    const timelineRect = timeline.getBoundingClientRect();
+    const markerRect = marker.getBoundingClientRect();
+    const markerWidth = markerRect.width;
+
+    let lineX: number;
+    if (isMarkerContentOverRightEdge.value) {
+      lineX = markerRect.right; // -translate-x-full: right edge sits on the line
+    }
+    else if (isMarkerContentOverLeftEdge.value) {
+      lineX = markerRect.left; // translate-x-0: left edge sits on the line
+    }
+    else {
+      lineX = markerRect.left + markerWidth / 2; // -translate-x-1/2: center sits on the line
+    }
+
+    isMarkerContentOverRightEdge.value = lineX + markerWidth / 2 > timelineRect.right;
+    isMarkerContentOverLeftEdge.value = lineX - markerWidth / 2 < timelineRect.left;
+  };
 
   const styleCache = new Map();
   const styleCacheMarkers = new Map();
@@ -560,6 +597,7 @@
   const { state: touchState, setLastTouchX, setInitialTouchList } = useTouchEvents({ viewportStart, viewportEnd });
 
   function onTouchMove (event: TouchEvent) {
+    checkGuidelineMarkerPosition();
     if (event.touches.length === 2 && touchState.initialPinchDistance !== null && touchState.initialTouchViewportStart !== null && touchState.initialTouchViewportEnd !== null) {
       const [touch1, touch2] = [...event.touches].sort((a, b) => a.clientX - b.clientX);
       const [initialTouch1, initialTouch2] = [touch1, touch2].map(t =>
@@ -645,6 +683,7 @@
   }
 
   function onMouseMove (event: MouseEvent) {
+    checkGuidelineMarkerPosition();
     emit('mousemoveTimeline', { time: getPositionInMsOfUIEvent(event), event });
   }
 
@@ -706,8 +745,7 @@
   }
 
   .item,
-  .background,
-  .marker {
+  .background {
     contain: strict;
   }
 
@@ -730,6 +768,26 @@
     background: var(--item-background, red);
     width: var(--item-marker-width, 1px);
     transform: translateX(-50%);
+    contain: unset;
+    display: flex;
+    align-items: start;
+    z-index: 1;
+    pointer-events: none;
+
+    &:deep(.marker-content) {
+      text-wrap: nowrap;
+      transform: translateX(-50%);
+      transition-property: transform;
+      transition-duration: 100ms;
+
+      &.move-right {
+        transform: translateX(0);
+      }
+
+      &.move-left {
+        transform: translateX(-100%);
+      }
+    }
   }
 
   .timestamps {
