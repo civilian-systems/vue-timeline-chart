@@ -761,7 +761,8 @@
       let horizontal: 'center' | 'left' | 'right' = 'center';
       if (event.clientX + halfWidth > timelineRect.right - (safe.right ?? 0)) {
         horizontal = 'left';
-      } else if (event.clientX - halfWidth < timelineRect.left + (safe.left ?? 0)) {
+      }
+      else if (event.clientX - halfWidth < timelineRect.left + (safe.left ?? 0)) {
         horizontal = 'right';
       }
 
