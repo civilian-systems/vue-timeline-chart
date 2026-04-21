@@ -61,7 +61,7 @@
           :style="group.cssVariables"
           @click="onClickGroup(group.id)"
         >
-          <div :class="['group-label', { fixed: fixedLabels }]">
+          <div :class="['group-label', !props.groupLabelInteractive && 'pointer-events-none', { fixed: fixedLabels }]">
             <slot name="group-label" :group="group">
               {{ group.label }}
             </slot>
@@ -172,6 +172,7 @@
     markers?: GTimelineMarker[];
     groupSelectable?: boolean;
     groupItemSelectable?: boolean;
+    groupLabelInteractive?: boolean;
     viewportMin?: number;
     viewportMax?: number;
     minViewportDuration?: number;
@@ -197,6 +198,7 @@
     scales: () => [],
     groupSelectable: false,
     groupItemSelectable: false,
+    groupLabelInteractive: false,
     viewportMin: undefined,
     viewportMax: undefined,
     minViewportDuration: 1000,
@@ -998,5 +1000,9 @@
     &.bottom-right {
       transform: translate(calc(-1 * var(--_arrow-offset)), var(--_gap));
     }
+  }
+
+  .pointer-events-none {
+    pointer-events: none;
   }
 </style>
