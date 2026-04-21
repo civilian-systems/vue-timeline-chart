@@ -967,6 +967,7 @@
 
   .timeline-tooltip {
     --_gap: var(--tooltip-gap, 12px);
+    --_arrow-offset: calc(2 * var(--tooltip-arrow-size, 6px));
 
     position: fixed;
     z-index: 10;
@@ -979,11 +980,11 @@
     }
 
     &.top-left {
-      transform: translate(-100%, calc(-100% - var(--_gap)));
+      transform: translate(calc(var(--_arrow-offset) - 100%), calc(-100% - var(--_gap)));
     }
 
     &.top-right {
-      transform: translate(0%, calc(-100% - var(--_gap)));
+      transform: translate(calc(-1 * var(--_arrow-offset)), calc(-100% - var(--_gap)));
     }
 
     &.bottom-center {
@@ -991,11 +992,11 @@
     }
 
     &.bottom-left {
-      transform: translate(-100%, var(--_gap));
+      transform: translate(calc(var(--_arrow-offset) - 100%), var(--_gap));
     }
 
     &.bottom-right {
-      transform: translate(0%, var(--_gap));
+      transform: translate(calc(-1 * var(--_arrow-offset)), var(--_gap));
     }
   }
 </style>
