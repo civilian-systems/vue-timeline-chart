@@ -156,7 +156,7 @@
 </template>
 
 <script lang="ts" setup generic="GTimelineItem extends TimelineItem, GTimelineGroup extends TimelineGroup, GTimelineMarker extends TimelineMarker">
-import {computed, type CSSProperties, nextTick, onMounted, provide, ref, shallowRef, UnwrapRef, watch, watchEffect} from 'vue';
+  import { computed, type CSSProperties, nextTick, onMounted, provide, ref, UnwrapRef, watch, watchEffect } from 'vue';
   import { useElementSize } from '../composables/useElementSize.ts';
   import { leadingZero } from '../helpers/leadingZero.ts';
   import { useScale } from '../composables/useScale.ts';
