@@ -85,6 +85,9 @@
                 @pointerdown.stop="onPointerDown($event, item)"
                 @pointerup.stop="onPointerUp($event, item)"
                 @contextmenu.prevent.stop="onContextMenu($event, item)"
+                @mouseenter="onItemMouseEnter($event, item)"
+                @mouseleave="onItemMouseLeave"
+                @mousemove="onItemMouseMove"
               >
                 <slot name="item" :item="item"></slot>
               </div>
@@ -140,11 +143,20 @@
         </div>
       </div>
     </div>
+    <div
+      v-if="hoveredItem && $slots.tooltip"
+      ref="tooltipEl"
+      class="timeline-tooltip"
+      :class="[tooltipPositionClass]"
+      :style="tooltipStyle"
+    >
+      <slot name="tooltip" :item="hoveredItem"></slot>
+    </div>
   </div>
 </template>
 
 <script lang="ts" setup generic="GTimelineItem extends TimelineItem, GTimelineGroup extends TimelineGroup, GTimelineMarker extends TimelineMarker">
-  import { computed, type CSSProperties, nextTick, onMounted, ref, watch, watchEffect } from 'vue';
+import {computed, type CSSProperties, nextTick, onMounted, provide, ref, shallowRef, UnwrapRef, watch, watchEffect} from 'vue';
   import { useElementSize } from '../composables/useElementSize.ts';
   import { leadingZero } from '../helpers/leadingZero.ts';
   import { useScale } from '../composables/useScale.ts';
@@ -175,6 +187,7 @@
     maxOffsetOutsideViewport?: number;
     scales?: TimelineScales[];
     weekStartsOn?: 0 | 1 | 2 | 3 | 4 | 5 | 6;
+    tooltipSafeSpace?: { top?: number; bottom?: number; left?: number; right?: number };
   }
 
   const props = withDefaults(defineProps<Props>(), {
@@ -216,6 +229,7 @@
     activeItems: () => [],
     maxOffsetOutsideViewport: 50,
     weekStartsOn: 0,
+    tooltipSafeSpace: () => ({ top: 0, bottom: 0, left: 0, right: 0 }),
   });
 
   const emit = defineEmits<{
@@ -514,6 +528,7 @@
   function onWheel (e: WheelEvent) {
     checkValidityOfProps();
     emit('wheel', e);
+    hoveredItem.value = null;
 
     if (e.deltaY === 0) {
       // prevent swipe gesture triggered history navigation:
@@ -641,6 +656,7 @@
   }
 
   function onTouchStart (event: TouchEvent) {
+    hoveredItem.value = null;
     setInitialTouchList(event);
     setLastTouchX(event);
 
@@ -697,6 +713,60 @@
 
   function onZoom (event: WheelEvent | TouchEvent) {
     emit('zoom', { event });
+  }
+
+  // Tooltip
+  const hoveredItem = ref<GTimelineItem | null>(null);
+  const tooltipEl = ref<HTMLElement | null>(null);
+  const tooltipX = ref(0);
+  const tooltipY = ref(0);
+  const tooltipPositionClass = ref('top-center');
+  provide('tooltipPositionClass', tooltipPositionClass);
+
+  const tooltipStyle = computed<CSSProperties>(() => ({
+    left: `${tooltipX.value}px`,
+    top: `${tooltipY.value}px`,
+  }));
+
+  function onItemMouseEnter (event: MouseEvent, item: GTimelineItem) {
+    hoveredItem.value = item as UnwrapRef<GTimelineItem>;
+    updateTooltipPosition(event);
+  }
+
+  function onItemMouseMove (event: MouseEvent) {
+    updateTooltipPosition(event);
+  }
+
+  function onItemMouseLeave () {
+    hoveredItem.value = null;
+  }
+
+  function updateTooltipPosition (event: MouseEvent) {
+    tooltipX.value = event.clientX;
+    tooltipY.value = event.clientY;
+
+    nextTick(() => {
+      if (!tooltipEl.value || !timelineEl.value) return;
+
+      const tooltipRect = tooltipEl.value.getBoundingClientRect();
+      const timelineRect = timelineEl.value.getBoundingClientRect();
+      const gap = 12;
+      const safe = props.tooltipSafeSpace;
+
+      const vertical = (event.clientY - gap - tooltipRect.height) < timelineRect.top + (safe.top ?? 0)
+        ? 'bottom'
+        : 'top';
+
+      const halfWidth = tooltipRect.width / 2;
+      let horizontal: 'center' | 'left' | 'right' = 'center';
+      if (event.clientX + halfWidth > timelineRect.right - (safe.right ?? 0)) {
+        horizontal = 'left';
+      } else if (event.clientX - halfWidth < timelineRect.left + (safe.left ?? 0)) {
+        horizontal = 'right';
+      }
+
+      tooltipPositionClass.value = `${vertical}-${horizontal}`;
+    });
   }
 </script>
 
@@ -892,5 +962,39 @@
 
   .background {
     background: var(--item-background, rgba(0, 0, 0, 10%));
+  }
+
+  .timeline-tooltip {
+    --_gap: var(--tooltip-gap, 12px);
+
+    position: fixed;
+    z-index: 10;
+    pointer-events: none;
+    transition-property: transform;
+    transition-duration: 100ms;
+
+    &.top-center {
+      transform: translate(-50%, calc(-100% - var(--_gap)));
+    }
+
+    &.top-left {
+      transform: translate(-100%, calc(-100% - var(--_gap)));
+    }
+
+    &.top-right {
+      transform: translate(0%, calc(-100% - var(--_gap)));
+    }
+
+    &.bottom-center {
+      transform: translate(-50%, var(--_gap));
+    }
+
+    &.bottom-left {
+      transform: translate(-100%, var(--_gap));
+    }
+
+    &.bottom-right {
+      transform: translate(0%, var(--_gap));
+    }
   }
 </style>
