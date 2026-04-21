@@ -3,8 +3,8 @@
     <div
       ref="timelineEl"
       class="timeline"
-      :class="[`mode-${props.mode}`]"
       @wheel="onWheel"
+      @click="onClick"
       @touchmove="onTouchMove"
       @touchstart="onTouchStart"
       @touchend="onTouchEnd"
@@ -53,13 +53,12 @@
         </div>
       </div>
 
-      <div class="groups" :class="props.groupSelectable && 'selectable'">
+      <div class="groups">
         <div
           v-for="group in groups"
           :key="group.id"
           :class="['group', group.className]"
           :style="group.cssVariables"
-          @click="onClickGroup(group.id)"
         >
           <div :class="['group-label', { fixed: fixedLabels }]">
             <slot name="group-label" :group="group">
@@ -79,15 +78,12 @@
                 v-for="(item, index) in visibleItems.filter((item) => item.group === group.id && item.type !== 'background')"
                 :key="item.id ?? index"
                 :style="getStyle(item)"
-                :class="['item', item.type, item.className, props.groupSelectable && 'selectable', {active: activeItems.includes(item.id)}]"
-                @click="onClickGroupItem($event, item)"
+                :class="['item', item.type, item.className, {active: activeItems.includes(item.id)}]"
+                @click.stop="onClick($event, item)"
                 @pointermove.stop="onPointerMove($event, item)"
                 @pointerdown.stop="onPointerDown($event, item)"
                 @pointerup.stop="onPointerUp($event, item)"
                 @contextmenu.prevent.stop="onContextMenu($event, item)"
-                @mouseenter="onItemMouseEnter($event, item)"
-                @mouseleave="onItemMouseLeave"
-                @mousemove="onItemMouseMove"
               >
                 <slot name="item" :item="item"></slot>
               </div>
@@ -98,7 +94,7 @@
             :key="item.id ?? `${item.start}${item.type}${item.end || ''}`"
             :style="getStyle(item)"
             :class="[item.type, item.className]"
-            @click.stop="onClickGroupItem($event, item)"
+            @click.stop="onClick($event, item)"
             @pointermove.stop="onPointerMove($event, item)"
             @pointerdown.stop="onPointerDown($event, item)"
             @pointerup.stop="onPointerUp($event, item)"
@@ -121,7 +117,7 @@
             :key="item.id ?? `${item.start}${item.type}${item.end || ''}`"
             :style="getStyle(item)"
             :class="[item.type, item.className]"
-            @click.stop="onClickGroupItem($event, item)"
+            @click.stop="onClick($event, item)"
             @pointermove.stop="onPointerMove($event, item)"
             @pointerdown.stop="onPointerDown($event, item)"
             @pointerup.stop="onPointerUp($event, item)"
@@ -129,6 +125,7 @@
           >
           </div>
         </div>
+
         <div v-if="visibleMarkersWithoutGroup.length > 0" class="markers">
           <div
             v-for="(item) in visibleMarkersWithoutGroup"
@@ -136,27 +133,16 @@
             :style="getStyle(item, true)"
             :class="[item.type, item.className]"
           >
-            <div :class="markerContentClassList">
-              <slot name="marker" :item="item"></slot>
-            </div>
+            <slot name="marker" :item="item"></slot>
           </div>
         </div>
       </div>
-    </div>
-    <div
-      v-if="hoveredItem && $slots.tooltip"
-      ref="tooltipEl"
-      class="timeline-tooltip"
-      :class="[tooltipPositionClass]"
-      :style="tooltipStyle"
-    >
-      <slot name="tooltip" :item="hoveredItem"></slot>
     </div>
   </div>
 </template>
 
 <script lang="ts" setup generic="GTimelineItem extends TimelineItem, GTimelineGroup extends TimelineGroup, GTimelineMarker extends TimelineMarker">
-  import { computed, type CSSProperties, nextTick, onMounted, provide, ref, UnwrapRef, watch, watchEffect } from 'vue';
+  import { computed, type CSSProperties, nextTick, onMounted, ref, watch, watchEffect } from 'vue';
   import { useElementSize } from '../composables/useElementSize.ts';
   import { leadingZero } from '../helpers/leadingZero.ts';
   import { useScale } from '../composables/useScale.ts';
@@ -170,8 +156,6 @@
     groups?: GTimelineGroup[];
     items?: GTimelineItem[];
     markers?: GTimelineMarker[];
-    groupSelectable?: boolean;
-    groupItemSelectable?: boolean;
     viewportMin?: number;
     viewportMax?: number;
     minViewportDuration?: number;
@@ -180,14 +164,12 @@
     initialViewportEnd?: number;
     renderTimestampLabel?: (timestamp: number, scale: { unit: string, step: number}) => string;
     fixedLabels?: boolean;
-    mode?: 'compact' | 'default';
     minTimestampWidth?: number;
     maxZoomSpeed?: number;
     activeItems?: TimelineItem['id'][];
     maxOffsetOutsideViewport?: number;
     scales?: TimelineScales[];
     weekStartsOn?: 0 | 1 | 2 | 3 | 4 | 5 | 6;
-    tooltipSafeSpace?: { top?: number; bottom?: number; left?: number; right?: number };
   }
 
   const props = withDefaults(defineProps<Props>(), {
@@ -195,8 +177,6 @@
     items: () => [],
     markers: () => [],
     scales: () => [],
-    groupSelectable: false,
-    groupItemSelectable: false,
     viewportMin: undefined,
     viewportMax: undefined,
     minViewportDuration: 1000,
@@ -223,13 +203,11 @@
       return returnValue;
     },
     fixedLabels: false,
-    mode: 'default',
     minTimestampWidth: 100,
     maxZoomSpeed: 60,
     activeItems: () => [],
     maxOffsetOutsideViewport: 50,
     weekStartsOn: 0,
-    tooltipSafeSpace: () => ({ top: 0, bottom: 0, left: 0, right: 0 }),
   });
 
   const emit = defineEmits<{
@@ -238,8 +216,6 @@
     (e: 'pointerup', value: { time: number; event: PointerEvent, item: GTimelineItem | GTimelineMarker | null }): void;
     (e: 'wheel', value: WheelEvent): void;
     (e: 'click', value: { time: number; event: MouseEvent, item: GTimelineItem | GTimelineMarker | null }): void;
-    (e: 'clickGroup', value: { id: string }): void;
-    (e: 'clickGroupItem', value: { time: number; event: MouseEvent, item: GTimelineItem | GTimelineMarker | null }): void;
     (e: 'contextmenu', value: { time: number; event: MouseEvent, item: GTimelineItem | GTimelineMarker | null }): void;
     (e: 'touchmove', value: { time: number; event: TouchEvent}): void;
     (e: 'touchstart', value: { time: number; event: TouchEvent}): void;
@@ -248,8 +224,6 @@
     (e: 'mouseleaveTimeline', value: { event: MouseEvent }): void;
     (e: 'changeViewport', value: { start: number; end: number }): void;
     (e: 'changeScale', value: TimelineScale): void;
-    (e: 'scrollHorizontally', value: { event: WheelEvent | TouchEvent }): void;
-    (e: 'zoom', value: { event: WheelEvent | TouchEvent }): void;
   }>();
 
   defineExpose({
@@ -331,42 +305,6 @@
   const visibleMarkers = computed(() => props.markers.filter((item) => item.start < viewportEnd.value && item.start > viewportStart.value).sort((a, b) => a.start - b.start) || []);
   const visibleMarkersWithoutGroup = computed(() => visibleMarkers.value.filter((item) => !item.group));
   const visibleBackgroundsWithoutGroup = computed(() => visibleItems.value.filter((item) => item.type === 'background' && !item.group));
-
-  const isMarkerContentOverRightEdge = ref(false);
-  const isMarkerContentOverLeftEdge = ref(false);
-
-  const markerContentClassList = computed(() => [
-    'marker-content',
-    isMarkerContentOverRightEdge.value && 'move-left',
-    isMarkerContentOverLeftEdge.value && 'move-right',
-  ]);
-
-  const checkGuidelineMarkerPosition = () => {
-    const marker = document.querySelector('.markers .marker .marker-content');
-    const timeline = document.querySelector('.timeline');
-
-    if (!timeline || !marker) {
-      return;
-    }
-
-    const timelineRect = timeline.getBoundingClientRect();
-    const markerRect = marker.getBoundingClientRect();
-    const markerWidth = markerRect.width;
-
-    let lineX: number;
-    if (isMarkerContentOverRightEdge.value) {
-      lineX = markerRect.right; // -translate-x-full: right edge sits on the line
-    }
-    else if (isMarkerContentOverLeftEdge.value) {
-      lineX = markerRect.left; // translate-x-0: left edge sits on the line
-    }
-    else {
-      lineX = markerRect.left + markerWidth / 2; // -translate-x-1/2: center sits on the line
-    }
-
-    isMarkerContentOverRightEdge.value = lineX + markerWidth / 2 > timelineRect.right;
-    isMarkerContentOverLeftEdge.value = lineX - markerWidth / 2 < timelineRect.left;
-  };
 
   const styleCache = new Map();
   const styleCacheMarkers = new Map();
@@ -476,8 +414,6 @@
 
     setViewport(viewportStart.value + deltaMs, viewportEnd.value + deltaMs);
 
-    onScrollHorizontally(event as WheelEvent | TouchEvent);
-
     if (event.type === 'wheel') {
       onMouseMove(event as WheelEvent);
     }
@@ -528,7 +464,6 @@
   function onWheel (e: WheelEvent) {
     checkValidityOfProps();
     emit('wheel', e);
-    hoveredItem.value = null;
 
     if (e.deltaY === 0) {
       // prevent swipe gesture triggered history navigation:
@@ -585,8 +520,6 @@
       return;
     }
 
-    onZoom(event);
-
     setViewport(proposedViewportStart, proposedViewportEnd);
 
     onMouseMove(event);
@@ -612,7 +545,6 @@
   const { state: touchState, setLastTouchX, setInitialTouchList } = useTouchEvents({ viewportStart, viewportEnd });
 
   function onTouchMove (event: TouchEvent) {
-    checkGuidelineMarkerPosition();
     if (event.touches.length === 2 && touchState.initialPinchDistance !== null && touchState.initialTouchViewportStart !== null && touchState.initialTouchViewportEnd !== null) {
       const [touch1, touch2] = [...event.touches].sort((a, b) => a.clientX - b.clientX);
       const [initialTouch1, initialTouch2] = [touch1, touch2].map(t =>
@@ -656,7 +588,6 @@
   }
 
   function onTouchStart (event: TouchEvent) {
-    hoveredItem.value = null;
     setInitialTouchList(event);
     setLastTouchX(event);
 
@@ -682,16 +613,8 @@
     emit('pointerup', { time: getPositionInMsOfUIEvent(event), event, item });
   }
 
-  function onClickGroupItem (event: MouseEvent, item: GTimelineItem | GTimelineMarker | null = null) {
-    if (props.groupItemSelectable) {
-      emit('clickGroupItem', { time: getPositionInMsOfUIEvent(event), event, item });
-    }
-  }
-
-  function onClickGroup (id: string) {
-    if (props.groupSelectable) {
-      emit('clickGroup', { id });
-    }
+  function onClick (event: MouseEvent, item: GTimelineItem | GTimelineMarker | null = null) {
+    emit('click', { time: getPositionInMsOfUIEvent(event), event, item });
   }
 
   function onContextMenu (event: MouseEvent, item: GTimelineItem | GTimelineMarker | null = null) {
@@ -699,75 +622,11 @@
   }
 
   function onMouseMove (event: MouseEvent) {
-    checkGuidelineMarkerPosition();
     emit('mousemoveTimeline', { time: getPositionInMsOfUIEvent(event), event });
   }
 
   function onMouseLeave (event: MouseEvent) {
     emit('mouseleaveTimeline', { event });
-  }
-
-  function onScrollHorizontally (event: WheelEvent | TouchEvent) {
-    emit('scrollHorizontally', { event });
-  }
-
-  function onZoom (event: WheelEvent | TouchEvent) {
-    emit('zoom', { event });
-  }
-
-  // Tooltip
-  const hoveredItem = ref<GTimelineItem | null>(null);
-  const tooltipEl = ref<HTMLElement | null>(null);
-  const tooltipX = ref(0);
-  const tooltipY = ref(0);
-  const tooltipPositionClass = ref('top-center');
-  provide('tooltipPositionClass', tooltipPositionClass);
-
-  const tooltipStyle = computed<CSSProperties>(() => ({
-    left: `${tooltipX.value}px`,
-    top: `${tooltipY.value}px`,
-  }));
-
-  function onItemMouseEnter (event: MouseEvent, item: GTimelineItem) {
-    hoveredItem.value = item as UnwrapRef<GTimelineItem>;
-    updateTooltipPosition(event);
-  }
-
-  function onItemMouseMove (event: MouseEvent) {
-    updateTooltipPosition(event);
-  }
-
-  function onItemMouseLeave () {
-    hoveredItem.value = null;
-  }
-
-  function updateTooltipPosition (event: MouseEvent) {
-    tooltipX.value = event.clientX;
-    tooltipY.value = event.clientY;
-
-    nextTick(() => {
-      if (!tooltipEl.value || !timelineEl.value) return;
-
-      const tooltipRect = tooltipEl.value.getBoundingClientRect();
-      const timelineRect = timelineEl.value.getBoundingClientRect();
-      const gap = 12;
-      const safe = props.tooltipSafeSpace;
-
-      const vertical = (event.clientY - gap - tooltipRect.height) < timelineRect.top + (safe.top ?? 0)
-        ? 'bottom'
-        : 'top';
-
-      const halfWidth = tooltipRect.width / 2;
-      let horizontal: 'center' | 'left' | 'right' = 'center';
-      if (event.clientX + halfWidth > timelineRect.right - (safe.right ?? 0)) {
-        horizontal = 'left';
-      }
-      else if (event.clientX - halfWidth < timelineRect.left + (safe.left ?? 0)) {
-        horizontal = 'right';
-      }
-
-      tooltipPositionClass.value = `${vertical}-${horizontal}`;
-    });
   }
 </script>
 
@@ -789,34 +648,9 @@
     }
   }
 
-  .timeline {
-    &.mode-compact {
-      .item {
-        &.range {
-          top: 0;
-          bottom: 0;
-          margin: auto;
-        }
-      }
-      .group {
-        padding: 4.5px 0;
-
-        .group-label {
-          position: absolute;
-          top: 0;
-          bottom: 0;
-          z-index: 1;
-          display: flex;
-          align-items: center;
-          line-height: normal;
-          padding: 0 0 0 0.4em;
-        }
-      }
-    }
-  }
-
   .item,
-  .background {
+  .background,
+  .marker {
     contain: strict;
   }
 
@@ -839,26 +673,6 @@
     background: var(--item-background, red);
     width: var(--item-marker-width, 1px);
     transform: translateX(-50%);
-    contain: unset;
-    display: flex;
-    align-items: start;
-    z-index: 1;
-    pointer-events: none;
-
-    &:deep(.marker-content) {
-      text-wrap: nowrap;
-      transform: translateX(-50%);
-      transition-property: transform;
-      transition-duration: 100ms;
-
-      &.move-right {
-        transform: translateX(0);
-      }
-
-      &.move-left {
-        transform: translateX(-100%);
-      }
-    }
   }
 
   .timestamps {
@@ -888,22 +702,9 @@
 
   .groups {
     position: relative;
-
-    &.selectable {
-      .group {
-        cursor: pointer;
-        transition: background 0.2s, color 0.2s;
-
-        &:hover {
-          background: var(--group-hover-background, transparent);
-          color: var(--group-hover-color, inherit);
-        }
-      }
-    }
   }
 
   .group {
-    background: var(--group-background, transparent);
     border-top: var(--group-border-top, 1px solid color-mix(in srgb, currentColor 15%, transparent));
     padding-top: var(--group-padding-top, 0);
     padding-bottom: var(--group-padding-bottom, 0.4em);
@@ -933,6 +734,7 @@
   }
 
   .item {
+    cursor: pointer;
     height: 100%;
     background: var(--item-background, #007bff);
     opacity: 0.7;
@@ -955,47 +757,9 @@
     &.range {
       border-radius: var(--item-range-border-radius, 0.5em);
     }
-
-    &.selectable {
-      cursor: pointer;
-    }
   }
 
   .background {
     background: var(--item-background, rgba(0, 0, 0, 10%));
-  }
-
-  .timeline-tooltip {
-    --_gap: var(--tooltip-gap, 12px);
-
-    position: fixed;
-    z-index: 10;
-    pointer-events: none;
-    transition-property: transform;
-    transition-duration: 100ms;
-
-    &.top-center {
-      transform: translate(-50%, calc(-100% - var(--_gap)));
-    }
-
-    &.top-left {
-      transform: translate(-100%, calc(-100% - var(--_gap)));
-    }
-
-    &.top-right {
-      transform: translate(0%, calc(-100% - var(--_gap)));
-    }
-
-    &.bottom-center {
-      transform: translate(-50%, var(--_gap));
-    }
-
-    &.bottom-left {
-      transform: translate(-100%, var(--_gap));
-    }
-
-    &.bottom-right {
-      transform: translate(0%, var(--_gap));
-    }
   }
 </style>
