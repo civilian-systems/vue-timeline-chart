@@ -57,7 +57,7 @@
         <div
           v-for="group in groups"
           :key="group.id"
-          :class="['group', group.className]"
+          :class="['group', selectedGroupId === group.id && 'selected', group.className]"
           :style="group.cssVariables"
           @click="onClickGroup(group.id)"
         >
@@ -156,7 +156,7 @@
 </template>
 
 <script lang="ts" setup generic="GTimelineItem extends TimelineItem, GTimelineGroup extends TimelineGroup, GTimelineMarker extends TimelineMarker">
-  import { computed, type CSSProperties, nextTick, onMounted, provide, ref, UnwrapRef, watch, watchEffect } from 'vue';
+import {computed, type CSSProperties, nextTick, onMounted, provide, Ref, ref, UnwrapRef, watch, watchEffect} from 'vue';
   import { useElementSize } from '../composables/useElementSize.ts';
   import { leadingZero } from '../helpers/leadingZero.ts';
   import { useScale } from '../composables/useScale.ts';
@@ -265,6 +265,9 @@
 
   const viewportStart = ref<number>(0);
   const viewportEnd = ref<number>(10000);
+
+  const selectedGroupId: Ref<string | null> = ref(null);
+
   const viewportDuration = computed(() => viewportEnd.value - viewportStart.value);
 
   /** The number of screen pixels per timeline ms */
@@ -692,6 +695,7 @@
 
   function onClickGroup (id: string) {
     if (props.groupSelectable) {
+      selectedGroupId.value = id;
       emit('clickGroup', { id });
     }
   }
@@ -899,6 +903,10 @@
         &:hover {
           background: var(--group-hover-background, transparent);
           color: var(--group-hover-color, inherit);
+        }
+
+        &.selected {
+          background: var(--group-selected-background, transparent);
         }
       }
     }
