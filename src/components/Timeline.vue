@@ -911,7 +911,7 @@
           border: 1px solid var(--group-selected-label-border-color, transparent);
           border-radius: 4px;
           padding: 2px 8px;
-          background-color: color-mix(in oklch, var(--group-selected-label-background) 25%, transparent);
+          background-color: var(--group-selected-label-background, transparent);
         }
       }
     }
