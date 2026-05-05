@@ -906,13 +906,6 @@
           background: var(--group-hover-background, transparent);
           color: var(--group-hover-color, inherit);
         }
-
-        &.selected .group-label [data-content='group-label-content'] {
-          border: 1px solid var(--group-selected-label-border-color, transparent);
-          border-radius: 4px;
-          padding: 2px 8px;
-          background-color: color-mix(in oklch, var(--group-selected-label-background) 25%, transparent);
-        }
       }
     }
   }
