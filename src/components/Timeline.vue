@@ -173,6 +173,7 @@
     groupSelectable?: boolean;
     groupItemSelectable?: boolean;
     groupLabelInteractive?: boolean;
+    initiallySelectedGroupId?: string | null;
     viewportMin?: number;
     viewportMax?: number;
     minViewportDuration?: number;
@@ -199,6 +200,7 @@
     groupSelectable: false,
     groupItemSelectable: false,
     groupLabelInteractive: false,
+    initiallySelectedGroupId: null,
     viewportMin: undefined,
     viewportMax: undefined,
     minViewportDuration: 1000,
@@ -266,7 +268,7 @@
   const viewportStart = ref<number>(0);
   const viewportEnd = ref<number>(10000);
 
-  const selectedGroupId: Ref<string | null> = ref(null);
+  const selectedGroupId: Ref<string | null> = ref(props.initiallySelectedGroupId);
 
   const viewportDuration = computed(() => viewportEnd.value - viewportStart.value);
 
@@ -905,8 +907,11 @@
           color: var(--group-hover-color, inherit);
         }
 
-        &.selected {
-          background: var(--group-selected-background, transparent);
+        &.selected .group-label [data-content='group-label-content'] {
+          border: 1px solid var(--group-selected-label-border-color, transparent);
+          border-radius: 4px;
+          padding: 2px 8px;
+          background-color: var(--group-selected-label-background, transparent);
         }
       }
     }
