@@ -156,7 +156,7 @@
 </template>
 
 <script lang="ts" setup generic="GTimelineItem extends TimelineItem, GTimelineGroup extends TimelineGroup, GTimelineMarker extends TimelineMarker">
-  import { computed, type CSSProperties, nextTick, onMounted, provide, Ref, ref, UnwrapRef, watch, watchEffect } from 'vue';
+  import { computed, type CSSProperties, nextTick, onMounted, provide, ref, UnwrapRef, watch, watchEffect } from 'vue';
   import { useElementSize } from '../composables/useElementSize.ts';
   import { leadingZero } from '../helpers/leadingZero.ts';
   import { useScale } from '../composables/useScale.ts';
@@ -173,7 +173,6 @@
     groupSelectable?: boolean;
     groupItemSelectable?: boolean;
     groupLabelInteractive?: boolean;
-    initiallySelectedGroupId?: string | null;
     viewportMin?: number;
     viewportMax?: number;
     minViewportDuration?: number;
@@ -200,7 +199,6 @@
     groupSelectable: false,
     groupItemSelectable: false,
     groupLabelInteractive: false,
-    initiallySelectedGroupId: null,
     viewportMin: undefined,
     viewportMax: undefined,
     minViewportDuration: 1000,
@@ -268,7 +266,7 @@
   const viewportStart = ref<number>(0);
   const viewportEnd = ref<number>(10000);
 
-  const selectedGroupId: Ref<string | null> = ref(props.initiallySelectedGroupId);
+  const selectedGroupId = defineModel<string | null>('groupId', { default: null });
 
   const viewportDuration = computed(() => viewportEnd.value - viewportStart.value);
 
