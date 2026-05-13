@@ -190,6 +190,7 @@
     weekStartsOn?: 0 | 1 | 2 | 3 | 4 | 5 | 6;
     tooltipSafeSpace?: { top?: number; bottom?: number; left?: number; right?: number };
     locale?: string;
+    isHorizontalScrollEnabled?: boolean;
   }
 
   function defaultRenderTimestampLabel(locale: string, timestamp: number, scale: { unit: string, step: number}) {
@@ -244,6 +245,7 @@
     weekStartsOn: 0,
     tooltipSafeSpace: () => ({ top: 0, bottom: 0, left: 0, right: 0 }),
     locale: 'default',
+    isHorizontalScrollEnabled: true,
   });
 
   const emit = defineEmits<{
@@ -483,6 +485,10 @@
   }
 
   function scrollHorizontal (delta: number, event: WheelEvent | TouchEvent) {
+    if (!props.isHorizontalScrollEnabled) {
+      return;
+    }
+
     const deltaMs = (delta / containerWidth.value) * viewportDuration.value;
     if (delta > 0 && viewportEnd.value === props.viewportMax) {
       return;
