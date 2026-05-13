@@ -29,7 +29,7 @@
             :timestamp="timestamp"
             :scale="scale"
           >
-            {{ renderTimestampLabel(timestamp, scale) }}
+            {{ renderTimestampLabelWrapper(timestamp, scale) }}
           </slot>
         </div>
         <slot name="timestamps-after" :scale="scale"></slot>
@@ -189,6 +189,35 @@
     scales?: TimelineScales[];
     weekStartsOn?: 0 | 1 | 2 | 3 | 4 | 5 | 6;
     tooltipSafeSpace?: { top?: number; bottom?: number; left?: number; right?: number };
+    locale?: string;
+  }
+
+  function defaultRenderTimestampLabel(locale: string, timestamp: number, scale: { unit: string, step: number}) {
+    const date = new Date(timestamp);
+    let returnValue = '';
+
+    if (!['hours', 'minutes', 'seconds', 'ms'].includes(scale.unit) || startOfDay(date).valueOf() === timestamp) {
+      returnValue += `${date.toLocaleString(locale, {
+        month: scale.unit !== 'years' && (startOfMonth(date).valueOf() === timestamp || scale.unit === 'days' || (startOfDay(date).valueOf() === timestamp) && !(scale.unit === 'months' && scale.step === 0.25)) ? 'short' : undefined,
+        year: startOfYear(date).valueOf() === timestamp ? 'numeric' : undefined,
+        era: startOfYear(date).valueOf() === timestamp && startOfYear(date).getFullYear() <= 0 ? 'short' : undefined,
+        day: scale.unit !== 'years' && !(scale.unit === 'months' && scale.step >= 1) && startOfDay(date).valueOf() === timestamp ? 'numeric' : undefined,
+      })} `;
+    }
+
+    if (['hours', 'minutes', 'seconds', 'ms'].includes(scale.unit)) {
+      returnValue += `${leadingZero(date.getHours())}:${leadingZero(date.getMinutes())}${date.getSeconds() > 0 ? `:${leadingZero(date.getSeconds())}` : ''}${date.getMilliseconds() > 0 ? `.${leadingZero(date.getMilliseconds())}` : ''}`;
+    }
+
+    return returnValue;
+  }
+
+  function renderTimestampLabelWrapper(timestamp: number, scale: { unit: string, step: number }) {
+    const locale = props.locale && props.locale.trim() ? props.locale : 'default';
+    if (typeof props.renderTimestampLabel === 'function') {
+      return props.renderTimestampLabel(timestamp, scale);
+    }
+    return defaultRenderTimestampLabel(locale, timestamp, scale);
   }
 
   const props = withDefaults(defineProps<Props>(), {
@@ -205,25 +234,7 @@
     maxViewportDuration: undefined,
     initialViewportStart: undefined,
     initialViewportEnd: undefined,
-    renderTimestampLabel: (timestamp: number, scale: { unit: string, step: number}) => {
-      const date = new Date(timestamp);
-      let returnValue = '';
-
-      if (!['hours', 'minutes', 'seconds', 'ms'].includes(scale.unit) || startOfDay(date).valueOf() === timestamp) {
-        returnValue += `${date.toLocaleString('default', {
-          month: scale.unit !== 'years' && (startOfMonth(date).valueOf() === timestamp || scale.unit === 'days' || (startOfDay(date).valueOf() === timestamp) && !(scale.unit === 'months' && scale.step === 0.25)) ? 'short' : undefined,
-          year: startOfYear(date).valueOf() === timestamp ? 'numeric' : undefined,
-          era: startOfYear(date).valueOf() === timestamp && startOfYear(date).getFullYear() <= 0 ? 'short' : undefined,
-          day: scale.unit !== 'years' && !(scale.unit === 'months' && scale.step >= 1) && startOfDay(date).valueOf() === timestamp ? 'numeric' : undefined,
-        })} `;
-      }
-
-      if (['hours', 'minutes', 'seconds', 'ms'].includes(scale.unit)) {
-        returnValue += `${leadingZero(date.getHours())}:${leadingZero(date.getMinutes())}${date.getSeconds() > 0 ? `:${leadingZero(date.getSeconds())}` : ''}${date.getMilliseconds() > 0 ? `.${leadingZero(date.getMilliseconds())}` : ''}`;
-      }
-
-      return returnValue;
-    },
+    renderTimestampLabel: undefined,
     fixedLabels: false,
     mode: 'default',
     minTimestampWidth: 100,
@@ -232,6 +243,7 @@
     maxOffsetOutsideViewport: 50,
     weekStartsOn: 0,
     tooltipSafeSpace: () => ({ top: 0, bottom: 0, left: 0, right: 0 }),
+    locale: 'default',
   });
 
   const emit = defineEmits<{
