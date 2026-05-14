@@ -870,6 +870,8 @@
     pointer-events: none;
 
     &:deep(.marker-content) {
+      position: sticky;
+      top: 32px;
       text-wrap: nowrap;
       transform: translateX(-50%);
       transition-property: transform;
@@ -890,10 +892,13 @@
     --_padding-inline: var(--timestamp-padding-inline, 0.4em);
     --_lineheight: var(--timestamp-line-height, 1.5em);
 
+    position: sticky;
+    top: 0;
     height: calc(var(--_padding-block) * 2 + var(--_lineheight));
     line-height: var(--_lineheight);
-    background: var(--timestamps-background, color-mix(in srgb, currentColor 5%, transparent));
+    background: var(--timestamps-background);
     color: var(--timestamps-color, inherit);
+    z-index: 2;
 
     .timestamp {
       padding: var(--_padding-block) var(--_padding-inline);
