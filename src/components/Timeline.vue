@@ -860,8 +860,8 @@
   }
 
   .marker {
-    background: var(--item-background, red);
-    width: var(--item-marker-width, 1px);
+    background: var(--marker-background, red);
+    width: var(--marker-width, 1px);
     transform: translateX(-50%);
     contain: unset;
     display: flex;
@@ -871,7 +871,7 @@
 
     &:deep(.marker-content) {
       position: sticky;
-      top: 32px;
+      top: var(--marker-content-top, 0);
       text-wrap: nowrap;
       transform: translateX(-50%);
       transition-property: transform;
