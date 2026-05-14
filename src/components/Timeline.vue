@@ -823,7 +823,7 @@
         }
       }
       .group {
-        padding: var(--mode-compact-row-gap, 4px) 0;
+        padding: 4.5px 0;
 
         .group-label {
           position: absolute;
