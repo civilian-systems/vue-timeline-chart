@@ -54,90 +54,91 @@
       </div>
 
       <div class="groups" :class="[props.groupSelectable && 'selectable', props.groupsClasses]">
-        <div
-          v-for="group in groups"
-          :key="group.id"
-          :class="['group', selectedGroupId === group.id && 'selected', group.className]"
-          :style="group.cssVariables"
-          @click="onClickGroup(group.id)"
-        >
-          <div :class="['group-label', !props.groupLabelInteractive && 'pointer-events-none', { fixed: fixedLabels }]">
-            <slot name="group-label" :group="group">
-              {{ group.label }}
-            </slot>
-          </div>
+        <div :class="['groups-inner-wrapper', props.groupsInnerWrapperClasses]">
+          <div
+            v-for="group in groups"
+            :key="group.id"
+            :class="['group', selectedGroupId === group.id && 'selected', group.className]"
+            :style="group.cssVariables"
+            @click="onClickGroup(group.id)"
+          >
+            <div :class="['group-label', !props.groupLabelInteractive && 'pointer-events-none', { fixed: fixedLabels }]">
+              <slot name="group-label" :group="group">
+                {{ group.label }}
+              </slot>
+            </div>
 
-          <div class="group-items">
-            <slot
-              :name="`items-${group.id}`"
-              :group="group"
-              :itemsInViewport="visibleItems.filter((item) => item.group === group.id)"
-              :viewportStart="viewportStart"
-              :viewportEnd="viewportEnd"
-            >
-              <div
-                v-for="(item, index) in visibleItems.filter((item) => item.group === group.id && item.type !== 'background')"
-                :key="item.id ?? index"
-                :style="getStyle(item)"
-                :class="['item', item.type, item.className, props.groupSelectable && 'selectable', {active: activeItems.includes(item.id)}]"
-                @click="onClickGroupItem($event, item)"
-                @pointermove.stop="onPointerMove($event, item)"
-                @pointerdown.stop="onPointerDown($event, item)"
-                @pointerup.stop="onPointerUp($event, item)"
-                @contextmenu.prevent.stop="onContextMenu($event, item)"
-                @mouseenter="onItemMouseEnter($event, item)"
-                @mouseleave="onItemMouseLeave"
-                @mousemove="onItemMouseMove"
+            <div class="group-items">
+              <slot
+                :name="`items-${group.id}`"
+                :group="group"
+                :itemsInViewport="visibleItems.filter((item) => item.group === group.id)"
+                :viewportStart="viewportStart"
+                :viewportEnd="viewportEnd"
               >
-                <slot name="item" :item="item"></slot>
-              </div>
-            </slot>
-          </div>
-          <div
-            v-for="(item) in visibleItems.filter((item) => item.group === group.id && item.type === 'background')"
-            :key="item.id ?? `${item.start}${item.type}${item.end || ''}`"
-            :style="getStyle(item)"
-            :class="[item.type, item.className]"
-            @click.stop="onClickGroupItem($event, item)"
-            @pointermove.stop="onPointerMove($event, item)"
-            @pointerdown.stop="onPointerDown($event, item)"
-            @pointerup.stop="onPointerUp($event, item)"
-            @contextmenu.prevent.stop="onContextMenu($event, item)"
-          >
-          </div>
-          <div
-            v-for="(item) in visibleMarkers.filter((item) => item.group === group.id)"
-            :key="item.id ?? `${item.start}${item.type}`"
-            :style="getStyle(item, true)"
-            :class="[item.type, item.className]"
-          >
-            <slot name="marker" :item="item"></slot>
-          </div>
-        </div>
-
-        <div v-if="visibleBackgroundsWithoutGroup.length > 0" class="backgrounds">
-          <div
-            v-for="(item) in visibleBackgroundsWithoutGroup"
-            :key="item.id ?? `${item.start}${item.type}${item.end || ''}`"
-            :style="getStyle(item)"
-            :class="[item.type, item.className]"
-            @click.stop="onClickGroupItem($event, item)"
-            @pointermove.stop="onPointerMove($event, item)"
-            @pointerdown.stop="onPointerDown($event, item)"
-            @pointerup.stop="onPointerUp($event, item)"
-            @contextmenu.prevent.stop="onContextMenu($event, item)"
-          >
-          </div>
-        </div>
-        <div v-if="visibleMarkersWithoutGroup.length > 0" class="markers">
-          <div
-            v-for="(item) in visibleMarkersWithoutGroup"
-            :key="item.id ?? `${item.start}${item.type}`"
-            :style="getStyle(item, true)"
-            :class="[item.type, item.className]"
-          >
-            <div :class="markerContentClassList">
+                <div
+                  v-for="(item, index) in visibleItems.filter((item) => item.group === group.id && item.type !== 'background')"
+                  :key="item.id ?? index"
+                  :style="getStyle(item)"
+                  :class="['item', item.type, item.className, props.groupSelectable && 'selectable', {active: activeItems.includes(item.id)}]"
+                  @click="onClickGroupItem($event, item)"
+                  @pointermove.stop="onPointerMove($event, item)"
+                  @pointerdown.stop="onPointerDown($event, item)"
+                  @pointerup.stop="onPointerUp($event, item)"
+                  @contextmenu.prevent.stop="onContextMenu($event, item)"
+                  @mouseenter="onItemMouseEnter($event, item)"
+                  @mouseleave="onItemMouseLeave"
+                  @mousemove="onItemMouseMove"
+                >
+                  <slot name="item" :item="item"></slot>
+                </div>
+              </slot>
+            </div>
+            <div
+              v-for="(item) in visibleItems.filter((item) => item.group === group.id && item.type === 'background')"
+              :key="item.id ?? `${item.start}${item.type}${item.end || ''}`"
+              :style="getStyle(item)"
+              :class="[item.type, item.className]"
+              @click.stop="onClickGroupItem($event, item)"
+              @pointermove.stop="onPointerMove($event, item)"
+              @pointerdown.stop="onPointerDown($event, item)"
+              @pointerup.stop="onPointerUp($event, item)"
+              @contextmenu.prevent.stop="onContextMenu($event, item)"
+            >
+            </div>
+            <div
+              v-for="(item) in visibleMarkers.filter((item) => item.group === group.id)"
+              :key="item.id ?? `${item.start}${item.type}`"
+              :style="getStyle(item, true)"
+              :class="[item.type, item.className]"
+            >
               <slot name="marker" :item="item"></slot>
+            </div>
+          </div>
+          <div v-if="visibleBackgroundsWithoutGroup.length > 0" class="backgrounds">
+            <div
+              v-for="(item) in visibleBackgroundsWithoutGroup"
+              :key="item.id ?? `${item.start}${item.type}${item.end || ''}`"
+              :style="getStyle(item)"
+              :class="[item.type, item.className]"
+              @click.stop="onClickGroupItem($event, item)"
+              @pointermove.stop="onPointerMove($event, item)"
+              @pointerdown.stop="onPointerDown($event, item)"
+              @pointerup.stop="onPointerUp($event, item)"
+              @contextmenu.prevent.stop="onContextMenu($event, item)"
+            >
+            </div>
+          </div>
+          <div v-if="visibleMarkersWithoutGroup.length > 0" class="markers">
+            <div
+              v-for="(item) in visibleMarkersWithoutGroup"
+              :key="item.id ?? `${item.start}${item.type}`"
+              :style="getStyle(item, true)"
+              :class="[item.type, item.className]"
+            >
+              <div :class="markerContentClassList">
+                <slot name="marker" :item="item"></slot>
+              </div>
             </div>
           </div>
         </div>
@@ -174,6 +175,7 @@
     groupItemSelectable?: boolean;
     groupLabelInteractive?: boolean;
     groupsClasses?: string;
+    groupsInnerWrapperClasses?: string;
     timelineClasses?: string;
     viewportMin?: number;
     viewportMax?: number;
@@ -232,6 +234,7 @@
     groupItemSelectable: false,
     groupLabelInteractive: false,
     groupsClasses: '',
+    groupsInnerWrapperClasses: '',
     timelineClasses: '',
     viewportMin: undefined,
     viewportMax: undefined,
