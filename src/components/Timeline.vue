@@ -3,7 +3,7 @@
     <div
       ref="timelineEl"
       class="timeline"
-      :class="[`mode-${props.mode}`]"
+      :class="[`mode-${props.mode}`, props.timelineClasses]"
       @wheel="onWheel"
       @touchmove="onTouchMove"
       @touchstart="onTouchStart"
@@ -174,6 +174,7 @@
     groupItemSelectable?: boolean;
     groupLabelInteractive?: boolean;
     groupsClasses?: string;
+    timelineClasses?: string;
     viewportMin?: number;
     viewportMax?: number;
     minViewportDuration?: number;
@@ -231,6 +232,7 @@
     groupItemSelectable: false,
     groupLabelInteractive: false,
     groupsClasses: '',
+    timelineClasses: '',
     viewportMin: undefined,
     viewportMax: undefined,
     minViewportDuration: 1000,
