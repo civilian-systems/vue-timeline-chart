@@ -53,7 +53,7 @@
         </div>
       </div>
 
-      <div class="groups" :class="props.groupSelectable && 'selectable'">
+      <div class="groups" :class="[props.groupSelectable && 'selectable', props.groupsClasses]">
         <div
           v-for="group in groups"
           :key="group.id"
@@ -173,6 +173,7 @@
     groupSelectable?: boolean;
     groupItemSelectable?: boolean;
     groupLabelInteractive?: boolean;
+    groupsClasses?: string;
     viewportMin?: number;
     viewportMax?: number;
     minViewportDuration?: number;
@@ -229,6 +230,7 @@
     groupSelectable: false,
     groupItemSelectable: false,
     groupLabelInteractive: false,
+    groupsClasses: '',
     viewportMin: undefined,
     viewportMax: undefined,
     minViewportDuration: 1000,
